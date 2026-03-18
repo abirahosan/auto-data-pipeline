@@ -1,0 +1,429 @@
+/* ============================================================
+   style.css — Auto Data Pipeline Tool (Dark Theme)
+   ============================================================ */
+
+/* ── 1. Variables ─────────────────────────────────────────── */
+:root {
+  --bg:           #0f0f0f;
+  --surface:      #1a1a1a;
+  --border:       #2e2e2e;
+  --ink:          #e8e8e8;
+  --mid:          #a0a0a0;
+  --light:        #6b6b6b;
+
+  --accent:       #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-dim:   #1e1b4b;
+
+  --success:      #22c55e;
+  --success-dim:  #052e16;
+
+  --danger:       #ef4444;
+  --danger-dim:   #450a0a;
+
+  --warning:      #f59e0b;
+  --warning-dim:  #451a03;
+
+  --radius-sm:    4px;
+  --radius:       8px;
+
+  --shadow-sm:    0 1px 2px rgba(0,0,0,.6);
+  --shadow:       0 1px 3px rgba(0,0,0,.7), 0 1px 2px rgba(0,0,0,.6);
+
+  --font-sans:    'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+
+  --max-width:    860px;
+  --gap:          1.5rem;
+}
+
+/* ── 2. Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ── 3. Body ──────────────────────────────────────────────── */
+body {
+  background:  var(--bg);
+  color:       var(--ink);
+  font-family: var(--font-sans);
+  font-size:   15px;
+  line-height: 1.65;
+  min-height:  100vh;
+  padding:     2.5rem 1rem 5rem;
+}
+
+/* ── 4. Page wrapper ──────────────────────────────────────── */
+.page, .container {
+  width:     100%;
+  max-width: var(--max-width);
+  margin:    0 auto;
+}
+
+/* ── 5. Header ────────────────────────────────────────────── */
+.header {
+  margin-bottom:  2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom:  1px solid var(--border);
+}
+.header-eyebrow {
+  font-family:    var(--font-mono);
+  font-size:      .7rem;
+  color:          var(--accent);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom:  .4rem;
+}
+.header h1 {
+  font-size:      1.75rem;
+  font-weight:    600;
+  letter-spacing: -.02em;
+  color:          var(--ink);
+  margin-bottom:  .35rem;
+  line-height:    1.2;
+}
+.header p { color: var(--mid); font-size: .9rem; max-width: 480px; }
+
+/* ── 6. Typography ────────────────────────────────────────── */
+h1 { font-size: 1.8rem; font-weight: 700; }
+h2 { font-size: 1.2rem; font-weight: 600; }
+h3 { font-size: 1rem;   font-weight: 600; }
+p  { color: var(--mid); font-size: .9rem; line-height: 1.7; }
+small { font-size: .78rem; color: var(--light); }
+a { color: var(--accent); text-decoration: none; transition: color .15s; }
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+/* ── 7. Flash messages ────────────────────────────────────── */
+.flash {
+  display:       flex;
+  align-items:   center;
+  gap:           .7rem;
+  padding:       .85rem 1rem;
+  border-radius: var(--radius-sm);
+  border:        1px solid transparent;
+  font-size:     .85rem;
+  margin-bottom: 1rem;
+}
+.flash-icon {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           1.3rem;
+  height:          1.3rem;
+  border-radius:   50%;
+  font-size:       .75rem;
+  font-weight:     700;
+  flex-shrink:     0;
+}
+.flash.error   { background: var(--danger-dim);  border-color: var(--danger);  color: #fca5a5; }
+.flash.success { background: var(--success-dim); border-color: var(--success); color: #86efac; }
+.flash.error .flash-icon   { background: var(--danger);  color: #fff; }
+.flash.success .flash-icon { background: var(--success); color: #fff; }
+
+/* ── 8. Cards ─────────────────────────────────────────────── */
+.card {
+  background:    var(--surface);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow:    var(--shadow);
+  margin-bottom: var(--gap);
+  overflow:      hidden;
+}
+.card-header {
+  padding:       .9rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  background:    #222222;
+  display:       flex;
+  align-items:   center;
+  gap:           .6rem;
+}
+.card-header h2 {
+  font-size:      .82rem;
+  font-weight:    600;
+  font-family:    var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color:          var(--mid);
+  margin:         0;
+}
+.card-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.card-dot--green { background: var(--success); }
+.card-dot--red   { background: var(--danger);  }
+.card-body        { padding: 1.4rem; }
+.card-body--flush { padding: 0; }
+
+/* ── 9. Drop Zone ─────────────────────────────────────────── */
+.drop-zone {
+  border:        2px dashed var(--border);
+  border-radius: var(--radius);
+  padding:       2.5rem 1.5rem;
+  text-align:    center;
+  cursor:        pointer;
+  position:      relative;
+  background:    #161616;
+  transition:    border-color .2s, background .2s;
+  margin-bottom: 1.2rem;
+}
+.drop-zone input[type="file"] {
+  display:  block;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background:   var(--accent-dim);
+}
+.drop-icon  { font-size: 2.2rem; margin-bottom: .5rem; line-height: 1; }
+.drop-title { font-size: .95rem; font-weight: 600; color: var(--ink); margin-bottom: .25rem; }
+.drop-sub   { font-size: .8rem;  color: var(--mid); }
+
+/* ── 10. File pill ────────────────────────────────────────── */
+.file-pill {
+  display:       none;
+  align-items:   center;
+  gap:           .4rem;
+  background:    var(--accent-dim);
+  border:        1px solid var(--accent);
+  border-radius: 20px;
+  padding:       .3rem .85rem;
+  font-size:     .78rem;
+  font-family:   var(--font-mono);
+  color:         #a5b4fc;
+  margin:        .8rem auto 0;
+  width:         fit-content;
+  max-width:     100%;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+.file-pill.show { display: flex; }
+
+/* ── 11. Run button ───────────────────────────────────────── */
+.btn-run {
+  width:           100%;
+  padding:         .8rem;
+  background:      var(--accent);
+  color:           #ffffff;
+  border:          none;
+  border-radius:   var(--radius-sm);
+  font-family:     var(--font-sans);
+  font-size:       .9rem;
+  font-weight:     500;
+  cursor:          pointer;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             .5rem;
+  margin-top:      1.2rem;
+  transition:      background .18s, transform .1s, opacity .18s;
+}
+.btn-run:hover:not(:disabled)  { background: var(--accent-hover); }
+.btn-run:active:not(:disabled) { transform: translateY(1px); }
+.btn-run:disabled              { opacity: .4; cursor: not-allowed; }
+
+/* ── 12. Spinner ──────────────────────────────────────────── */
+.spinner {
+  display:       none;
+  width:         15px;
+  height:        15px;
+  border:        2px solid rgba(255,255,255,.2);
+  border-top:    2px solid #ffffff;
+  border-radius: 50%;
+  flex-shrink:   0;
+  animation:     spin .65s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 13. Results section ──────────────────────────────────── */
+.results-section         { display: none; }
+.results-section.visible { display: block; }
+
+/* ── 14. Stats row ────────────────────────────────────────── */
+.stats-row {
+  display:               grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap:                   1rem;
+  margin-bottom:         var(--gap);
+}
+.stat-box {
+  background:    var(--surface);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  padding:       1rem 1.1rem;
+  box-shadow:    var(--shadow-sm);
+}
+.stat-label {
+  font-size:      .68rem;
+  font-weight:    600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color:          var(--mid);
+  margin-bottom:  .3rem;
+  font-family:    var(--font-mono);
+}
+.stat-value {
+  font-size:      1.4rem;
+  font-weight:    700;
+  letter-spacing: -.02em;
+  color:          var(--ink);
+  line-height:    1.1;
+}
+
+/* ── 15. Download bar ─────────────────────────────────────── */
+.download-bar {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  background:      var(--success-dim);
+  border:          1px solid var(--success);
+  border-radius:   var(--radius);
+  padding:         1rem 1.4rem;
+  margin-bottom:   var(--gap);
+  gap:             1rem;
+  flex-wrap:       wrap;
+}
+.download-info {
+  display:     flex;
+  align-items: center;
+  gap:         .7rem;
+  font-size:   .85rem;
+  color:       #86efac;
+}
+.download-icon { font-size: 1.4rem; }
+.btn-download {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             .4rem;
+  padding:         .6rem 1.2rem;
+  background:      var(--success);
+  color:           #000;
+  border:          none;
+  border-radius:   var(--radius-sm);
+  font-family:     var(--font-sans);
+  font-size:       .85rem;
+  font-weight:     600;
+  text-decoration: none;
+  transition:      background .18s, transform .1s;
+  white-space:     nowrap;
+}
+.btn-download:hover  { background: #16a34a; color: #000; text-decoration: none; }
+.btn-download:active { transform: translateY(1px); }
+
+/* ── 16. Data table ───────────────────────────────────────── */
+.table-wrap { width: 100%; overflow-x: auto; }
+table {
+  width:           100%;
+  border-collapse: collapse;
+  font-size:       .82rem;
+  font-family:     var(--font-mono);
+  background:      var(--surface);
+}
+table thead tr { background: #222222; }
+table th {
+  padding:        .6rem 1rem;
+  text-align:     left;
+  font-size:      .7rem;
+  font-weight:    700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color:          var(--mid);
+  border-bottom:  2px solid var(--border);
+  white-space:    nowrap;
+}
+table td {
+  padding:       .5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color:         var(--ink);
+  white-space:   nowrap;
+}
+table tbody tr:last-child td { border-bottom: none; }
+table tbody tr:hover td      { background: #222222; }
+
+/* ── 17. Pipeline steps ───────────────────────────────────── */
+.pipeline-steps { display: flex; flex-direction: column; }
+.step-row {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           1rem;
+  padding:       .9rem 0;
+  border-bottom: 1px solid var(--border);
+  animation:     fadeIn .3s ease both;
+}
+.step-row:last-child { border-bottom: none; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.step-num {
+  flex-shrink:     0;
+  width:           1.8rem;
+  height:          1.8rem;
+  border-radius:   50%;
+  background:      var(--accent-dim);
+  color:           #a5b4fc;
+  font-family:     var(--font-mono);
+  font-size:       .72rem;
+  font-weight:     700;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  margin-top:      .15rem;
+}
+.step-info { flex: 1; min-width: 0; }
+.step-name {
+  font-family:   var(--font-mono);
+  font-size:     .82rem;
+  font-weight:   600;
+  color:         var(--ink);
+  margin-bottom: .18rem;
+}
+.step-msg { font-size: .82rem; color: var(--mid); word-break: break-word; }
+.step-badge {
+  flex-shrink:   0;
+  font-size:     .65rem;
+  font-family:   var(--font-mono);
+  background:    var(--success-dim);
+  color:         var(--success);
+  border:        1px solid #166534;
+  border-radius: 20px;
+  padding:       .2rem .65rem;
+  margin-top:    .2rem;
+  white-space:   nowrap;
+}
+
+/* ── 18. Empty state ──────────────────────────────────────── */
+.empty-state { text-align: center; padding: 3.5rem 1.5rem; }
+.empty-icon  { font-size: 2.8rem; margin-bottom: .7rem; line-height: 1; }
+.empty-title { font-size: .95rem; font-weight: 600; color: var(--ink); margin-bottom: .35rem; }
+.empty-sub   { font-size: .82rem; color: var(--mid); }
+
+/* ── 19. Utilities ────────────────────────────────────────── */
+.hidden  { display: none !important; }
+.visible { display: block !important; }
+.mono    { font-family: var(--font-mono); }
+.divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+/* ── 20. Responsive ───────────────────────────────────────── */
+@media (max-width: 640px) {
+  body         { padding: 1.5rem .75rem 4rem; }
+  .header h1   { font-size: 1.4rem; }
+  .card-body   { padding: 1rem; }
+  .card-header { padding: .75rem 1rem; }
+  .stats-row   { grid-template-columns: 1fr 1fr; }
+  table th,
+  table td     { padding: .45rem .7rem; }
+  .btn-run     { font-size: .85rem; }
+}
+@media (max-width: 380px) {
+  .stats-row { grid-template-columns: 1fr; }
+}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.chart-box{background:#161616;border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;}
+.chart-box--wide{grid-column:1/-1;}
+.chart-title{font-family:var(--font-mono);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--mid);margin-bottom:1rem;}
+.chart-wrap{position:relative;height:220px;}
+.chart-box--wide .chart-wrap{height:200px;}
+@media(max-width:640px){.chart-grid{grid-template-columns:1fr;}.chart-box--wide{grid-column:1;}}

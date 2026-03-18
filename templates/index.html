@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Auto Data Pipeline Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <p class="header-eyebrow">v1.0 &middot; sklearn pipeline</p>
+    <h1>Auto Data Pipeline Tool</h1>
+    <p>Upload a CSV file and run it through a 7-step preprocessing pipeline automatically.</p>
+  </header>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}{% for msg in messages %}
+      <div class="flash error"><span class="flash-icon">!</span>{{ msg }}</div>
+    {% endfor %}{% endif %}
+  {% endwith %}
+  <div class="card">
+    <div class="card-header"><span class="card-dot"></span><h2>Upload Dataset</h2></div>
+    <div class="card-body">
+      <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+        <div class="drop-zone" id="dropZone">
+          <input type="file" name="file" id="fileInput" accept=".csv"/>
+          <div class="drop-icon">&#128194;</div>
+          <div class="drop-title">Drop your CSV here</div>
+          <div class="drop-sub">or click to browse &mdash; .csv files only</div>
+        </div>
+        <div class="file-pill" id="filePill"><span>&#128196;</span><span id="fileName">&mdash;</span></div>
+        <button type="submit" class="btn-run" id="submitBtn" disabled>
+          <span class="spinner" id="spinner"></span>
+          <span id="btnText">Select a file to continue</span>
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="results-section {% if preview %}visible{% endif %}">
+    {% if preview %}
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-label">Original Shape</div><div class="stat-value">{{ original_shape[0] }}&times;{{ original_shape[1] }}</div></div>
+        <div class="stat-box"><div class="stat-label">After Pipeline</div><div class="stat-value">{{ processed_shape[0] }}&times;{{ processed_shape[1] }}</div></div>
+        <div class="stat-box"><div class="stat-label">Rows Removed</div><div class="stat-value">{{ original_shape[0] - processed_shape[0] }}</div></div>
+        <div class="stat-box"><div class="stat-label">Steps Run</div><div class="stat-value">{{ summary | length }}</div></div>
+      </div>
+      {% if download_ready and output_filename %}
+      <div class="download-bar">
+        <div class="download-info"><span class="download-icon">&#128190;</span><span><strong>{{ output_filename }}</strong> &mdash; ready</span></div>
+        <a href="/download/{{ output_filename }}" class="btn-download">&#11015; Download CSV</a>
+      </div>
+      {% endif %}
+      {% if chart_data %}
+      <div class="card">
+        <div class="card-header"><span class="card-dot" style="background:#a78bfa"></span><h2>Visual Analysis</h2></div>
+        <div class="card-body">
+          <div class="chart-grid">
+            <div class="chart-box"><div class="chart-title">Rows: Before vs After</div><div class="chart-wrap"><canvas id="rowsChart"></canvas></div></div>
+            <div class="chart-box"><div class="chart-title">Column Types</div><div class="chart-wrap"><canvas id="colTypesChart"></canvas></div></div>
+            <div class="chart-box chart-box--wide"><div class="chart-title">Rows Remaining Per Step</div><div class="chart-wrap"><canvas id="stepsChart"></canvas></div></div>
+            <div class="chart-box chart-box--wide"><div class="chart-title">Column Means After Normalization</div><div class="chart-wrap"><canvas id="meansChart"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="card">
+        <div class="card-header"><span class="card-dot"></span><h2>Processed Data &mdash; First 5 Rows</h2></div>
+        <div class="card-body card-body--flush"><div class="table-wrap">{{ preview | safe }}</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-dot card-dot--green"></span><h2>Pipeline Summary</h2></div>
+        <div class="card-body">
+          <div class="pipeline-steps">
+            {% for item in summary %}
+            <div class="step-row" style="animation-delay: {{ loop.index0 * 0.07 }}s">
+              <div class="step-num">{{ item.step }}</div>
+              <div class="step-info"><div class="step-name">{{ item.name }}</div><div class="step-msg">{{ item.message }}</div></div>
+              <div class="step-badge">&#10003; done</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="card"><div class="card-body"><div class="empty-state">
+        <div class="empty-icon">&#128202;</div>
+        <div class="empty-title">No data yet</div>
+        <div class="empty-sub">Upload a CSV file above to see results and charts.</div>
+      </div></div></div>
+    {% endif %}
+  </div>
+</div>
+{% if chart_data %}
+<script>
+const chartData = {{ chart_data | tojson }};
+Chart.defaults.color='#a0a0a0';Chart.defaults.borderColor='#2e2e2e';Chart.defaults.font.family="'IBM Plex Mono',monospace";Chart.defaults.font.size=11;
+const C=['rgba(167,139,250,0.85)','rgba(99,102,241,0.85)','rgba(34,197,94,0.85)','rgba(239,68,68,0.85)','rgba(251,191,36,0.85)','rgba(236,72,153,0.85)','rgba(34,211,238,0.85)','rgba(251,146,60,0.85)'];
+new Chart(document.getElementById('rowsChart'),{type:'bar',data:{labels:['Original','After Pipeline'],datasets:[{data:[chartData.original_rows,chartData.processed_rows],backgroundColor:['rgba(99,102,241,0.85)','rgba(34,197,94,0.85)'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#2e2e2e'}},y:{grid:{color:'#2e2e2e'},beginAtZero:true}}}});
+new Chart(document.getElementById('colTypesChart'),{type:'doughnut',data:{labels:['Numeric','Categorical'],datasets:[{data:[chartData.numeric_cols,chartData.categorical_cols],backgroundColor:['rgba(167,139,250,0.85)','rgba(251,191,36,0.85)'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:16}}},cutout:'65%'}});
+new Chart(document.getElementById('stepsChart'),{type:'line',data:{labels:chartData.step_labels,datasets:[{label:'Rows',data:chartData.step_rows,borderColor:'rgba(167,139,250,0.85)',backgroundColor:'rgba(167,139,250,0.1)',borderWidth:2,pointBackgroundColor:'rgba(167,139,250,0.85)',pointRadius:5,fill:true,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#2e2e2e'}},y:{grid:{color:'#2e2e2e'},beginAtZero:false}}}});
+new Chart(document.getElementById('meansChart'),{type:'bar',data:{labels:chartData.col_names,datasets:[{data:chartData.col_means,backgroundColor:C.slice(0,chartData.col_names.length),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#2e2e2e'}},y:{grid:{color:'#2e2e2e'},beginAtZero:true,max:1.0,ticks:{callback:v=>v.toFixed(2)}}}}});
+</script>
+{% endif %}
+<script>
+const fi=document.getElementById('fileInput'),fp=document.getElementById('filePill'),fn=document.getElementById('fileName'),sb=document.getElementById('submitBtn'),bt=document.getElementById('btnText'),sp=document.getElementById('spinner'),dz=document.getElementById('dropZone'),fm=document.getElementById('uploadForm');
+function sel(f){if(!f)return;fn.textContent=f.name;fp.classList.add('show');sb.disabled=false;bt.textContent='Run Pipeline \u2192';}
+fi.addEventListener('change',()=>sel(fi.files[0]));
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');var f=e.dataTransfer.files[0];if(f){fi.files=e.dataTransfer.files;sel(f);}});
+fm.addEventListener('submit',()=>{sb.disabled=true;sp.style.display='block';bt.textContent='Processing\u2026';});
+</script>
+</body>
+</html>
